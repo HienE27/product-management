@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import ProductRow from './ProductRow';
 
 type Product = {
   id: number;
@@ -227,24 +228,15 @@ export default function ProductsPage() {
           </thead>
           <tbody>
             {products.map((p) => (
-              <tr key={p.id}>
-                <td>{p.id}</td>
-                <td>{p.name}</td>
-                <td>{p.price.toLocaleString()}</td>
-                <td>
-                  <Image
-                    src={p.image}
-                    alt={p.name}
-                    width={80}
-                    height={80}
-                  />
-                </td>
-                <td>
-                  <button onClick={() => handleEdit(p)}>Sửa</button>
-                  <button onClick={() => handleDelete(p.id)}>Xóa</button>
-                </td>
-              </tr>
-            ))}
+  <ProductRow
+    key={p.id}
+    product={p}
+    onEdit={handleEdit}
+    onDelete={handleDelete}
+    formatCurrency={formatCurrency}
+  />
+))}
+
           </tbody>
         </table>
       </section>
