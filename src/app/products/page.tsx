@@ -28,6 +28,14 @@ export default function ProductsPage() {
     image: '',
   });
 
+  function formatCurrency(value: number): string {
+  return value.toLocaleString("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  });
+}
+
+
   function resetForm() {
     if (editingId !== null) {
       const ok = confirm('Bạn có chắc muốn hủy chỉnh sửa hiện tại không?');
