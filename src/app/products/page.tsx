@@ -207,7 +207,7 @@ export default function ProductsPage() {
           <div style={{ display: 'flex', gap: 8 }}>
             {/* Dòng này sẽ dùng tạo CONFLICT 2 */}
             <button type="submit">
-                {editingId === null ? 'Thêm sản phẩm mới (Add product)' : 'Cập nhật sản phẩm(Save changes)'}
+                {editingId === null ? 'Thêm sản phẩm mới (Add product)' : 'Cập nhật sản phẩm(Save change)'}
             </button>
             {editingId !== null && (
               <button type="button" onClick={resetForm}>
