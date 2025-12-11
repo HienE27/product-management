@@ -28,9 +28,14 @@ export default function ProductsPage() {
   });
 
   function resetForm() {
+    if (editingId !== null) {
+      const ok = confirm('Bạn có chắc muốn hủy chỉnh sửa hiện tại không?');
+      if (!ok) return;
+    }
     setForm({ id: '', name: '', price: '', image: '' });
     setEditingId(null);
   }
+
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -131,10 +136,18 @@ export default function ProductsPage() {
   }
 
   function handleDelete(id: number) {
-    if (!confirm(`Xóa sản phẩm Id = ${id}?`)) return;
+    const product = products.find((p) => p.id === id);
+    const label = product ? `${product.name} (Id = ${product.id})` : `Id = ${id}`;
+
+    if (!confirm(`Bạn có chắc muốn xóa sản phẩm ${label}?`)) return;
+
     setProducts((prev) => prev.filter((p) => p.id !== id));
-    if (editingId === id) resetForm();
+
+    if (editingId === id) {
+      resetForm();
+    }
   }
+
 
   return (
     <main style={{ padding: 24, fontFamily: 'sans-serif' }}>
