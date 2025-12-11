@@ -121,9 +121,9 @@ export default function ProductsPage() {
             ? {
               ...p,
               id: parsedId,
-              name: trimmedName,
+              name: form.name,
               price: parsedPrice,
-              image: trimmedImage,
+              image: form.image,
             }
             : p,
         ),
@@ -161,8 +161,7 @@ export default function ProductsPage() {
   return (
     <main style={{ padding: 24, fontFamily: 'sans-serif' }}>
       {/* Dòng này sẽ dùng tạo CONFLICT 1 */}
-      <h1>Danh sách sản phẩm (version A)</h1>
-
+      <h1>Product List (version 2B)</h1>
 
       <section style={{ marginTop: 16, marginBottom: 24 }}>
         <h2>{editingId === null ? 'Thêm sản phẩm' : `Sửa sản phẩm #${editingId}`}</h2>
