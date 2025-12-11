@@ -28,13 +28,14 @@ export default function ProductsPage() {
     image: '',
   });
 
-  function formatCurrency(value: number): string {
-  return value.toLocaleString("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  });
-}
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
+  function formatCurrency(value: number): string {
+    return value.toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    });
+  }
 
   function resetForm() {
     if (editingId !== null) {
@@ -42,13 +43,39 @@ export default function ProductsPage() {
       if (!ok) return;
     }
     setForm({ id: '', name: '', price: '', image: '' });
+    setImagePreview(null);
     setEditingId(null);
   }
-
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  }
+
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Kiểm tra loại file
+      if (!file.type.startsWith('image/')) {
+        alert('Vui lòng chọn file ảnh hợp lệ');
+        return;
+      }
+
+      // Kiểm tra kích thước file (tối đa 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Kích thước file không được vượt quá 5MB');
+        return;
+      }
+
+      // Tạo preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        setImagePreview(result);
+        setForm((prev) => ({ ...prev, image: result }));
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -85,12 +112,7 @@ export default function ProductsPage() {
     }
 
     if (!trimmedImage) {
-      alert('Image không được để trống');
-      return;
-    }
-
-    if (!trimmedImage.startsWith('/')) {
-      alert('Image path nên bắt đầu bằng "/" (ví dụ: /images/p1.jpg)');
+      alert('Vui lòng chọn hình ảnh');
       return;
     }
 
@@ -133,7 +155,6 @@ export default function ProductsPage() {
     resetForm();
   }
 
-
   function handleEdit(product: Product) {
     setEditingId(product.id);
     setForm({
@@ -142,6 +163,7 @@ export default function ProductsPage() {
       price: String(product.price),
       image: product.image,
     });
+    setImagePreview(product.image);
   }
 
   function handleDelete(id: number) {
@@ -156,7 +178,6 @@ export default function ProductsPage() {
       resetForm();
     }
   }
-
 
   return (
     <main style={{ padding: 24, fontFamily: 'sans-serif' }}>
@@ -213,41 +234,82 @@ export default function ProductsPage() {
               <button type="button" onClick={resetForm}>
                 Hủy
               </button>
-            )}
+              {editingId !== null && (
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="px-6 py-3 bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-zinc-900 dark:text-zinc-50 font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2 dark:focus:ring-offset-zinc-800"
+                >
+                  Hủy
+                </button>
+              )}
+            </div>
+          </form>
+        </section>
+
+        {/* Products List Section */}
+        <section className="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+          <div className="px-6 sm:px-8 py-6 border-b border-zinc-200 dark:border-zinc-800">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
+                Danh sách sản phẩm
+              </h2>
+              <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium">
+                {products.length} sản phẩm
+              </span>
+            </div>
           </div>
-        </form>
-      </section>
 
-      <section>
-        <h2>Danh sách</h2>
-        <table
-          border={1}
-          cellPadding={8}
-          style={{ borderCollapse: 'collapse', width: '100%' }}
-        >
-          <thead>
-            <tr>
-              <th>Id</th>
-              <th>Name</th>
-              <th>Price</th>
-              <th>Image</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((p) => (
-  <ProductRow
-    key={p.id}
-    product={p}
-    onEdit={handleEdit}
-    onDelete={handleDelete}
-    formatCurrency={formatCurrency}
-  />
-))}
-
-          </tbody>
-        </table>
-      </section>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-zinc-50 dark:bg-zinc-800/50">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">
+                    ID
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">
+                    Tên sản phẩm
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">
+                    Giá
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">
+                    Hình ảnh
+                  </th>
+                  <th className="px-6 py-4 text-center text-xs font-semibold text-zinc-600 dark:text-zinc-400 uppercase tracking-wider">
+                    Thao tác
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+                {products.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-12 text-center">
+                      <div className="flex flex-col items-center gap-3">
+                        <svg className="w-12 h-12 text-zinc-400 dark:text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                        </svg>
+                        <p className="text-zinc-500 dark:text-zinc-400 font-medium">Chưa có sản phẩm nào</p>
+                        <p className="text-sm text-zinc-400 dark:text-zinc-500">Thêm sản phẩm đầu tiên của bạn ở trên</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  products.map((p) => (
+                    <ProductRow
+                      key={p.id}
+                      product={p}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                      formatCurrency={formatCurrency}
+                    />
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
