@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import ProductRow from './ProductRow';
 
 type Product = {
   id: number;
@@ -27,10 +28,23 @@ export default function ProductsPage() {
     image: '',
   });
 
+  function formatCurrency(value: number): string {
+  return value.toLocaleString("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  });
+}
+
+
   function resetForm() {
+    if (editingId !== null) {
+      const ok = confirm('Bạn có chắc muốn hủy chỉnh sửa hiện tại không?');
+      if (!ok) return;
+    }
     setForm({ id: '', name: '', price: '', image: '' });
     setEditingId(null);
   }
+
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
@@ -42,35 +56,75 @@ export default function ProductsPage() {
 
     const parsedId = Number(form.id);
     const parsedPrice = Number(form.price);
+    const trimmedName = form.name.trim();
+    const trimmedImage = form.image.trim();
 
-    if (!parsedId || !form.name || !parsedPrice || !form.image) {
-      alert('Nhập đầy đủ Id, Name, Price, Image');
+    if (!form.id || isNaN(parsedId)) {
+      alert('Id phải là số hợp lệ');
+      return;
+    }
+
+    if (parsedId <= 0) {
+      alert('Id phải lớn hơn 0');
+      return;
+    }
+
+    if (!trimmedName) {
+      alert('Name không được để trống');
+      return;
+    }
+
+    if (!form.price || isNaN(parsedPrice)) {
+      alert('Price phải là số hợp lệ');
+      return;
+    }
+
+    if (parsedPrice <= 0) {
+      alert('Price phải lớn hơn 0');
+      return;
+    }
+
+    if (!trimmedImage) {
+      alert('Image không được để trống');
+      return;
+    }
+
+    if (!trimmedImage.startsWith('/')) {
+      alert('Image path nên bắt đầu bằng "/" (ví dụ: /images/p1.jpg)');
       return;
     }
 
     if (editingId === null) {
+      // THÊM MỚI
       if (products.some((p) => p.id === parsedId)) {
         alert('Id đã tồn tại');
         return;
       }
       const newProduct: Product = {
         id: parsedId,
-        name: form.name,
+        name: trimmedName,
         price: parsedPrice,
-        image: form.image,
+        image: trimmedImage,
       };
       setProducts((prev) => [...prev, newProduct]);
     } else {
+      // SỬA
+      // Nếu đổi Id sang Id đã tồn tại (khác chính nó) thì báo lỗi
+      if (products.some((p) => p.id === parsedId && p.id !== editingId)) {
+        alert('Id mới bị trùng với sản phẩm khác');
+        return;
+      }
+
       setProducts((prev) =>
         prev.map((p) =>
           p.id === editingId
             ? {
-                ...p,
-                id: parsedId,
-                name: form.name,
-                price: parsedPrice,
-                image: form.image,
-              }
+              ...p,
+              id: parsedId,
+              name: trimmedName,
+              price: parsedPrice,
+              image: trimmedImage,
+            }
             : p,
         ),
       );
@@ -78,6 +132,7 @@ export default function ProductsPage() {
 
     resetForm();
   }
+
 
   function handleEdit(product: Product) {
     setEditingId(product.id);
@@ -90,10 +145,18 @@ export default function ProductsPage() {
   }
 
   function handleDelete(id: number) {
-    if (!confirm(`Xóa sản phẩm Id = ${id}?`)) return;
+    const product = products.find((p) => p.id === id);
+    const label = product ? `${product.name} (Id = ${product.id})` : `Id = ${id}`;
+
+    if (!confirm(`Bạn có chắc muốn xóa sản phẩm ${label}?`)) return;
+
     setProducts((prev) => prev.filter((p) => p.id !== id));
-    if (editingId === id) resetForm();
+
+    if (editingId === id) {
+      resetForm();
+    }
   }
+
 
   return (
     <main style={{ padding: 24, fontFamily: 'sans-serif' }}>
@@ -112,30 +175,39 @@ export default function ProductsPage() {
             placeholder="Id (số)"
             value={form.id}
             onChange={handleChange}
+            type="number"
+            min={1}
+            required
           />
           <input
             name="name"
             placeholder="Name"
             value={form.name}
             onChange={handleChange}
+            required
           />
           <input
             name="price"
             placeholder="Price (số)"
             value={form.price}
             onChange={handleChange}
+            type="number"
+            min={0}
+            required
           />
           <input
             name="image"
             placeholder="Image path (ví dụ: /images/p1.jpg)"
             value={form.image}
             onChange={handleChange}
+            required
           />
+
 
           <div style={{ display: 'flex', gap: 8 }}>
             {/* Dòng này sẽ dùng tạo CONFLICT 2 */}
             <button type="submit">
-              {editingId === null ? 'Thêm sản phẩm' : 'Lưu thay đổi'}
+                {editingId === null ? 'Thêm sản phẩm mới (Add product)' : 'Cập nhật sản phẩm(Save change)'}
             </button>
             {editingId !== null && (
               <button type="button" onClick={resetForm}>
@@ -164,24 +236,15 @@ export default function ProductsPage() {
           </thead>
           <tbody>
             {products.map((p) => (
-              <tr key={p.id}>
-                <td>{p.id}</td>
-                <td>{p.name}</td>
-                <td>{p.price.toLocaleString()}</td>
-                <td>
-                  <Image
-                    src={p.image}
-                    alt={p.name}
-                    width={80}
-                    height={80}
-                  />
-                </td>
-                <td>
-                  <button onClick={() => handleEdit(p)}>Sửa</button>
-                  <button onClick={() => handleDelete(p.id)}>Xóa</button>
-                </td>
-              </tr>
-            ))}
+  <ProductRow
+    key={p.id}
+    product={p}
+    onEdit={handleEdit}
+    onDelete={handleDelete}
+    formatCurrency={formatCurrency}
+  />
+))}
+
           </tbody>
         </table>
       </section>
