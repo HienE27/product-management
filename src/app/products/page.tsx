@@ -161,7 +161,8 @@ export default function ProductsPage() {
   return (
     <main style={{ padding: 24, fontFamily: 'sans-serif' }}>
       {/* Dòng này sẽ dùng tạo CONFLICT 1 */}
-      <h1>Danh sách sản phẩm</h1>
+      <h1>Danh sách sản phẩm (version A)</h1>
+
 
       <section style={{ marginTop: 16, marginBottom: 24 }}>
         <h2>{editingId === null ? 'Thêm sản phẩm' : `Sửa sản phẩm #${editingId}`}</h2>
