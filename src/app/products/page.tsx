@@ -141,12 +141,12 @@ export default function ProductsPage() {
         prev.map((p) =>
           p.id === editingId
             ? {
-                ...p,
-                id: parsedId,
-                name: trimmedName,
-                price: parsedPrice,
-                image: trimmedImage,
-              }
+              ...p,
+              id: parsedId,
+              name: form.name,
+              price: parsedPrice,
+              image: form.image,
+            }
             : p,
         ),
       );
@@ -180,150 +180,59 @@ export default function ProductsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-zinc-50 via-white to-zinc-100 dark:from-zinc-950 dark:via-black dark:to-zinc-900 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-50 mb-2">
-            Danh sách sản phẩm
-          </h1>
-          <p className="text-zinc-600 dark:text-zinc-400">
-            Quản lý sản phẩm của bạn một cách dễ dàng
-          </p>
-        </div>
+    <main style={{ padding: 24, fontFamily: 'sans-serif' }}>
+      {/* Dòng này sẽ dùng tạo CONFLICT 1 */}
+      <h1>Product List (version 2B)</h1>
 
-        {/* Form Section */}
-        <section className="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg border border-zinc-200 dark:border-zinc-800 p-6 sm:p-8 mb-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className={`w-1 h-8 rounded-full ${editingId === null ? 'bg-blue-500' : 'bg-amber-500'}`} />
-            <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
-              {editingId === null ? 'Thêm sản phẩm mới' : `Chỉnh sửa sản phẩm #${editingId}`}
-            </h2>
-          </div>
+      <section style={{ marginTop: 16, marginBottom: 24 }}>
+        <h2>{editingId === null ? 'Thêm sản phẩm' : `Sửa sản phẩm #${editingId}`}</h2>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <label htmlFor="id" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                  ID <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="id"
-                  name="id"
-                  placeholder="Nhập ID (số)"
-                  value={form.id}
-                  onChange={handleChange}
-                  type="number"
-                  min={1}
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                />
-              </div>
+        <form
+          onSubmit={handleSubmit}
+          style={{ display: 'grid', gap: 8, maxWidth: 400 }}
+        >
+          <input
+            name="id"
+            placeholder="Id (số)"
+            value={form.id}
+            onChange={handleChange}
+            type="number"
+            min={1}
+            required
+          />
+          <input
+            name="name"
+            placeholder="Name"
+            value={form.name}
+            onChange={handleChange}
+            required
+          />
+          <input
+            name="price"
+            placeholder="Price (số)"
+            value={form.price}
+            onChange={handleChange}
+            type="number"
+            min={0}
+            required
+          />
+          <input
+            name="image"
+            placeholder="Image path (ví dụ: /images/p1.jpg)"
+            value={form.image}
+            onChange={handleChange}
+            required
+          />
 
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                  Tên sản phẩm <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  placeholder="Nhập tên sản phẩm"
-                  value={form.name}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                />
-              </div>
 
-              <div>
-                <label htmlFor="price" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                  Giá <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="price"
-                  name="price"
-                  placeholder="Nhập giá (VND)"
-                  value={form.price}
-                  onChange={handleChange}
-                  type="number"
-                  min={0}
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                />
-              </div>
-
-              <div className="sm:col-span-2">
-                <label htmlFor="image" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                  Hình ảnh sản phẩm <span className="text-red-500">*</span>
-                </label>
-                <div className="space-y-3">
-                  <div className="relative">
-                    <input
-                      id="image"
-                      name="image"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      required={!imagePreview}
-                      className="w-full px-4 py-3 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900/30 dark:file:text-blue-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    />
-                  </div>
-                  {imagePreview && (
-                    <div className="relative inline-block">
-                      <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800">
-                        <Image
-                          src={imagePreview}
-                          alt="Preview"
-                          fill
-                          className="object-cover"
-                          unoptimized
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setImagePreview(null);
-                          setForm((prev) => ({ ...prev, image: '' }));
-                          // Reset file input
-                          const fileInput = document.getElementById('image') as HTMLInputElement;
-                          if (fileInput) fileInput.value = '';
-                        }}
-                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transition-colors"
-                        title="Xóa ảnh"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                  )}
-                </div>
-                <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                  Chọn file ảnh (JPG, PNG, GIF) - Tối đa 5MB
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap gap-3 pt-2">
-              <button
-                type="submit"
-                className="flex-1 sm:flex-initial px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-zinc-800"
-              >
-                {editingId === null ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    Thêm sản phẩm
-                  </span>
-                ) : (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Lưu thay đổi
-                  </span>
-                )}
+          <div style={{ display: 'flex', gap: 8 }}>
+            {/* Dòng này sẽ dùng tạo CONFLICT 2 */}
+            <button type="submit">
+              {editingId === null ? 'Add product' : 'Save changes'}
+            </button>
+            {editingId !== null && (
+              <button type="button" onClick={resetForm}>
+                Hủy
               </button>
               {editingId !== null && (
                 <button
