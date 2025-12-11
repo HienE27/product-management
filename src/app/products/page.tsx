@@ -42,34 +42,74 @@ export default function ProductsPage() {
 
     const parsedId = Number(form.id);
     const parsedPrice = Number(form.price);
+    const trimmedName = form.name.trim();
+    const trimmedImage = form.image.trim();
 
-    if (!parsedId || !form.name || !parsedPrice || !form.image) {
-      alert('Nhập đầy đủ Id, Name, Price, Image');
+    if (!form.id || isNaN(parsedId)) {
+      alert('Id phải là số hợp lệ');
+      return;
+    }
+
+    if (parsedId <= 0) {
+      alert('Id phải lớn hơn 0');
+      return;
+    }
+
+    if (!trimmedName) {
+      alert('Name không được để trống');
+      return;
+    }
+
+    if (!form.price || isNaN(parsedPrice)) {
+      alert('Price phải là số hợp lệ');
+      return;
+    }
+
+    if (parsedPrice <= 0) {
+      alert('Price phải lớn hơn 0');
+      return;
+    }
+
+    if (!trimmedImage) {
+      alert('Image không được để trống');
+      return;
+    }
+
+    if (!trimmedImage.startsWith('/')) {
+      alert('Image path nên bắt đầu bằng "/" (ví dụ: /images/p1.jpg)');
       return;
     }
 
     if (editingId === null) {
+      // THÊM MỚI
       if (products.some((p) => p.id === parsedId)) {
         alert('Id đã tồn tại');
         return;
       }
       const newProduct: Product = {
         id: parsedId,
-        name: form.name,
+        name: trimmedName,
         price: parsedPrice,
-        image: form.image,
+        image: trimmedImage,
       };
       setProducts((prev) => [...prev, newProduct]);
     } else {
+      // SỬA
+      // Nếu đổi Id sang Id đã tồn tại (khác chính nó) thì báo lỗi
+      if (products.some((p) => p.id === parsedId && p.id !== editingId)) {
+        alert('Id mới bị trùng với sản phẩm khác');
+        return;
+      }
+
       setProducts((prev) =>
         prev.map((p) =>
           p.id === editingId
             ? {
               ...p,
               id: parsedId,
-              name: form.name,
+              name: trimmedName,
               price: parsedPrice,
-              image: form.image,
+              image: trimmedImage,
             }
             : p,
         ),
@@ -78,6 +118,7 @@ export default function ProductsPage() {
 
     resetForm();
   }
+
 
   function handleEdit(product: Product) {
     setEditingId(product.id);
