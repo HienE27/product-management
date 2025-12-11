@@ -65,12 +65,12 @@ export default function ProductsPage() {
         prev.map((p) =>
           p.id === editingId
             ? {
-                ...p,
-                id: parsedId,
-                name: form.name,
-                price: parsedPrice,
-                image: form.image,
-              }
+              ...p,
+              id: parsedId,
+              name: form.name,
+              price: parsedPrice,
+              image: form.image,
+            }
             : p,
         ),
       );
@@ -112,25 +112,34 @@ export default function ProductsPage() {
             placeholder="Id (số)"
             value={form.id}
             onChange={handleChange}
+            type="number"
+            min={1}
+            required
           />
           <input
             name="name"
             placeholder="Name"
             value={form.name}
             onChange={handleChange}
+            required
           />
           <input
             name="price"
             placeholder="Price (số)"
             value={form.price}
             onChange={handleChange}
+            type="number"
+            min={0}
+            required
           />
           <input
             name="image"
             placeholder="Image path (ví dụ: /images/p1.jpg)"
             value={form.image}
             onChange={handleChange}
+            required
           />
+
 
           <div style={{ display: 'flex', gap: 8 }}>
             {/* Dòng này sẽ dùng tạo CONFLICT 2 */}
